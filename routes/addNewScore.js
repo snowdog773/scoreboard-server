@@ -4,7 +4,7 @@ const { MongoClient } = require("mongodb");
 const dotenv = require("dotenv").config();
 const uri = process.env.DB_CONNECTION_URI;
 
-app.get("/", async (req, res) => {
+app.post("/", async (req, res) => {
   const database = "hangman";
   const collection = "hi-scores";
   const client = new MongoClient(uri);
@@ -13,11 +13,13 @@ app.get("/", async (req, res) => {
     // database and collection code goes here
     const db = client.db(database);
     const coll = db.collection(collection);
-    const cursor = await coll.find().sort({ score: -1 }).toArray();
-
-    res.send(cursor);
+    const result = await coll.insertOne({
+      name: req.body.name,
+      score: req.body.score,
+    });
+    res.send(result);
   } catch (err) {
-    res.send({ status: 0 });
+    res.send("Server error, your connection sucks!");
 
     console.log(err);
   } finally {
